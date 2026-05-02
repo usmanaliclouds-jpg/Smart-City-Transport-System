@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart City Transport System</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0e1a; --surface:#111827; --card:#1a2236; --border:#2a3a55;
+    --accent:#00c6ff; --accent2:#f59e0b; --green:#10b981; --red:#ef4444;
+    --text:#e2e8f0; --muted:#8899aa; --radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(0,198,255,.07),transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(245,158,11,.06),transparent 60%);pointer-events:none;z-index:0;}
+  .screen{display:none;min-height:100vh;position:relative;z-index:1;}
+  .screen.active{display:flex;flex-direction:column;}
+  /* LANDING */
+  #landing{align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0e1a,#0f172a 50%,#0a1628);}
+  .landing-inner{text-align:center;padding:40px 20px;max-width:680px;}
+  .logo-icon{font-size:72px;margin-bottom:16px;filter:drop-shadow(0 0 30px rgba(0,198,255,.5));animation:float 3s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .logo-title{font-family:'Rajdhani',sans-serif;font-size:clamp(2.2rem,6vw,3.8rem);font-weight:700;letter-spacing:3px;background:linear-gradient(90deg,#00c6ff,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+  .logo-sub{color:var(--muted);font-size:1rem;letter-spacing:4px;text-transform:uppercase;margin-bottom:48px;}
+  .landing-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+  .btn-primary{background:linear-gradient(135deg,#00c6ff,#0080aa);color:#fff;border:none;padding:14px 40px;border-radius:50px;font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:600;letter-spacing:2px;cursor:pointer;transition:all .3s;box-shadow:0 4px 20px rgba(0,198,255,.3);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,198,255,.5);}
+  .btn-outline{background:transparent;color:var(--accent2);border:2px solid var(--accent2);padding:12px 36px;border-radius:50px;font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:600;letter-spacing:2px;cursor:pointer;transition:all .3s;}
+  .btn-outline:hover{background:var(--accent2);color:#000;transform:translateY(-2px);}
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:460px;padding:40px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:slideUp .3s ease;}
+  @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-close{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;}
+  .modal-close:hover{color:var(--text);}
+  .modal-title{font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;margin-bottom:6px;color:var(--accent);}
+  .modal-sub{color:var(--muted);font-size:.88rem;margin-bottom:28px;}
+  .tab-row{display:flex;margin-bottom:24px;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+  .tab-btn{flex:1;padding:10px;background:transparent;color:var(--muted);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:600;transition:all .2s;}
+  .tab-btn.active{background:var(--accent);color:#000;}
+  /* FIELDS */
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:.8rem;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+  .field input,.field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;}
+  .field input:focus,.field select:focus{border-color:var(--accent);}
+  .field select option{background:var(--surface);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .btn-full{width:100%;padding:13px;border:none;border-radius:var(--radius);font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all .3s;background:linear-gradient(135deg,#00c6ff,#0080aa);color:#fff;box-shadow:0 4px 15px rgba(0,198,255,.25);margin-top:8px;}
+  .btn-full:hover{box-shadow:0 6px 25px rgba(0,198,255,.45);transform:translateY(-1px);}
+  .btn-full:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .btn-full.amber{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 15px rgba(245,158,11,.25);}
+  .btn-full.amber:hover{box-shadow:0 6px 25px rgba(245,158,11,.45);}
+  .error-msg{color:var(--red);font-size:.82rem;margin-top:6px;display:none;}
+  .success-msg{color:var(--green);font-size:.85rem;text-align:center;margin-top:10px;display:none;}
+  /* NAV */
+  .topnav{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:rgba(17,24,39,.95);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
+  .nav-brand{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:2px;color:var(--accent);}
+  .nav-brand span{color:var(--accent2);}
+  .nav-user{display:flex;align-items:center;gap:16px;font-size:.88rem;color:var(--muted);}
+  .nav-user strong{color:var(--text);}
+  .nav-logout{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:.82rem;transition:all .2s;}
+  .nav-logout:hover{border-color:var(--red);color:var(--red);}
+  /* DASH */
+  .dash-body{display:flex;flex:1;}
+  .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:24px 0;flex-shrink:0;}
+  .sidebar-menu{list-style:none;}
+  .sidebar-menu a{display:flex;align-items:center;gap:10px;padding:12px 24px;color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:600;transition:all .2s;border-left:3px solid transparent;}
+  .sidebar-menu a:hover,.sidebar-menu a.active{color:var(--text);background:rgba(0,198,255,.07);border-left-color:var(--accent);}
+  .sidebar-menu a span{font-size:1.1rem;}
+  .main-content{flex:1;padding:28px;overflow-y:auto;}
+  .section-title{font-family:'Rajdhani',sans-serif;font-size:1.7rem;font-weight:700;margin-bottom:6px;color:var(--text);}
+  .section-title span{color:var(--accent);}
+  .section-sub{color:var(--muted);font-size:.88rem;margin-bottom:24px;}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:28px;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),transparent);}
+  .stat-card.amber::before{background:linear-gradient(90deg,var(--accent2),transparent);}
+  .stat-card.green::before{background:linear-gradient(90deg,var(--green),transparent);}
+  .stat-card.red::before{background:linear-gradient(90deg,var(--red),transparent);}
+  .stat-icon{font-size:1.8rem;margin-bottom:8px;}
+  .stat-val{font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;}
+  .stat-label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+  .form-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:24px;}
+  .form-card-title{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:20px;color:var(--accent2);display:flex;align-items:center;gap:8px;}
+  .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  thead tr{background:var(--surface);}
+  thead th{padding:12px 14px;text-align:left;font-size:.75rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+  tbody tr{border-bottom:1px solid rgba(42,58,85,.5);transition:background .15s;}
+  tbody tr:hover{background:rgba(0,198,255,.04);}
+  tbody td{padding:11px 14px;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+  .badge-blue{background:rgba(0,198,255,.15);color:var(--accent);}
+  .badge-amber{background:rgba(245,158,11,.15);color:var(--accent2);}
+  .badge-green{background:rgba(16,185,129,.15);color:var(--green);}
+  .badge-red{background:rgba(239,68,68,.15);color:var(--red);}
+  .action-btn{padding:4px 10px;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:700;transition:all .2s;margin-right:4px;}
+  .edit-btn{background:rgba(245,158,11,.15);color:var(--accent2);}
+  .edit-btn:hover{background:var(--accent2);color:#000;}
+  .del-btn{background:rgba(239,68,68,.15);color:var(--red);}
+  .del-btn:hover{background:var(--red);color:#fff;}
+  /* WIZARD */
+  .wizard-steps{display:flex;margin-bottom:28px;}
+  .wstep{flex:1;text-align:center;padding:12px 8px;border-bottom:3px solid var(--border);color:var(--muted);font-size:.82rem;font-weight:700;transition:all .3s;}
+  .wstep.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .wstep.done{color:var(--green);border-bottom-color:var(--green);}
+  .wstep-num{font-family:'Rajdhani',sans-serif;font-size:1.3rem;display:block;}
+  .wizard-page{display:none;}
+  .wizard-page.active{display:block;}
+  .route-option{background:var(--surface);border:2px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;cursor:pointer;transition:all .2s;display:flex;justify-content:space-between;align-items:center;}
+  .route-option:hover,.route-option.selected{border-color:var(--accent);background:rgba(0,198,255,.06);}
+  .route-option.selected .check-icon{display:inline;}
+  .check-icon{display:none;color:var(--accent);font-size:1.2rem;}
+  .route-name{font-weight:700;font-size:.95rem;margin-bottom:4px;}
+  .route-meta{font-size:.78rem;color:var(--muted);}
+  .ticket-confirm{background:linear-gradient(135deg,rgba(0,198,255,.1),rgba(245,158,11,.05));border:1px solid var(--accent);border-radius:var(--radius);padding:24px;text-align:center;}
+  .ticket-detail{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem;}
+  .ticket-detail:last-child{border:none;}
+  .ticket-detail span:first-child{color:var(--muted);}
+  .ticket-detail span:last-child{font-weight:700;}
+  .ticket-num{font-family:'Rajdhani',sans-serif;font-size:2rem;color:var(--accent2);}
+  .my-ticket{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s;}
+  .my-ticket:hover{border-color:var(--accent);}
+  .ticket-info h4{font-family:'Rajdhani',sans-serif;font-size:1.1rem;margin-bottom:4px;}
+  .ticket-info p{font-size:.8rem;color:var(--muted);}
+  .ticket-price{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--accent2);}
+  /* EDIT MODAL */
+  .edit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:2000;align-items:center;justify-content:center;}
+  .edit-modal.open{display:flex;}
+  .edit-modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:500px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.7);animation:slideUp .3s ease;}
+  .edit-modal-title{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;color:var(--accent2);margin-bottom:20px;}
+  /* LOADER */
+  .loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* TOAST */
+  .toast{position:fixed;bottom:30px;right:30px;z-index:9999;background:var(--card);border:1px solid var(--green);border-radius:var(--radius);padding:14px 22px;color:var(--text);font-size:.9rem;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateX(200px);opacity:0;transition:all .4s;max-width:360px;}
+  .toast.show{transform:translateX(0);opacity:1;}
+  .toast.error{border-color:var(--red);}
+  /* DB badge */
+  .db-badge{display:inline-block;background:rgba(16,185,129,.12);border:1px solid var(--green);color:var(--green);font-size:.7rem;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:1px;margin-left:8px;}
+  .hint{background:rgba(0,198,255,.07);border:1px solid rgba(0,198,255,.2);border-radius:8px;padding:12px 16px;font-size:.82rem;color:var(--muted);margin-bottom:20px;}
+  .hint strong{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing" class="screen active">
+  <div class="landing-inner">
+    <div class="logo-icon">🚆</div>
+    <div class="logo-title">SMART CITY<br>TRANSPORT</div>
+    <div class="logo-sub">Faisalabad · Connected</div>
+    <div class="landing-btns">
+      <button class="btn-primary" onclick="openModal('signin')">🔐 Sign In</button>
+      <button class="btn-outline" onclick="openModal('signup')">📝 Sign Up</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Welcome Back</div>
+    <div class="modal-sub" id="modalSub">Sign in to continue</div>
+    <div class="tab-row" id="authTabs">
+      <button class="tab-btn active" onclick="switchAuthTab('signin')">SIGN IN</button>
+      <button class="tab-btn" onclick="switchAuthTab('signup')">SIGN UP</button>
+    </div>
+    <!-- SIGN IN -->
+    <div id="signinForm">
+      <div class="field"><label>Email</label><input type="email" id="si_email" placeholder="ali@email.com"></div>
+      <div class="field"><label>Password (Phone for passengers)</label><input type="password" id="si_pass" placeholder="e.g. 03001234567"></div>
+      <div class="field"><label>Role</label>
+        <select id="si_role">
+          <option value="passenger">Passenger</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div class="error-msg" id="si_error">Invalid credentials.</div>
+      <button class="btn-full" id="si_btn" onclick="doSignIn()">SIGN IN →</button>
+      <div class="success-msg" id="si_success">✓ Logging you in...</div>
+    </div>
+    <!-- SIGN UP -->
+    <div id="signupForm" style="display:none">
+      <div class="field-row">
+        <div class="field"><label>Full Name</label><input type="text" id="su_name" placeholder="Ali Ahmed"></div>
+        <div class="field"><label>Date of Birth</label><input type="date" id="su_dob"></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="su_email" placeholder="ali@email.com"></div>
+      <div class="field-row">
+        <div class="field"><label>Phone (used as password)</label><input type="text" id="su_phone" placeholder="03001234567"></div>
+        <div class="field"><label>Confirm Phone</label><input type="text" id="su_phone2" placeholder="03001234567"></div>
+      </div>
+      <div class="error-msg" id="su_error">Please fill all fields.</div>
+      <button class="btn-full amber" id="su_btn" onclick="doSignUp()">CREATE ACCOUNT →</button>
+      <div class="success-msg" id="su_success">✓ Account created! Sign in with your phone number.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PASSENGER DASHBOARD -->
+<div id="passengerDash" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand">🚆 SMART<span>TRANSIT</span> <span class="db-badge">ORACLE LIVE</span></div>
+    <div class="nav-user">Welcome, <strong id="pax_name">Passenger</strong>
+      <button class="nav-logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="dash-body">
+    <aside class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="#" class="active" onclick="showPaxPanel('p_home',this)"><span>🏠</span> Dashboard</a></li>
+        <li><a href="#" onclick="showPaxPanel('p_book',this)"><span>🎫</span> Book Ticket</a></li>
+        <li><a href="#" onclick="showPaxPanel('p_tickets',this);loadMyTickets()"><span>📋</span> My Tickets</a></li>
+        <li><a href="#" onclick="showPaxPanel('p_routes',this)"><span>🗺️</span> Routes</a></li>
+        <li><a href="#" onclick="showPaxPanel('p_schedule',this)"><span>🕐</span> Schedules</a></li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <!-- HOME -->
+      <div id="p_home" class="panel active">
+        <div class="section-title">Dashboard <span>Overview</span></div>
+        <div class="section-sub">Live data from Oracle 11g database.</div>
+        <div class="cards-grid">
+          <div class="stat-card"><div class="stat-icon">🎫</div><div class="stat-val" id="pax_my_tickets">—</div><div class="stat-label">My Tickets</div></div>
+          <div class="stat-card amber"><div class="stat-icon">🗺️</div><div class="stat-val" id="stat_routes">—</div><div class="stat-label">Active Routes</div></div>
+          <div class="stat-card green"><div class="stat-icon">🚆</div><div class="stat-val" id="stat_vehicles">—</div><div class="stat-label">Vehicles</div></div>
+          <div class="stat-card red"><div class="stat-icon">📍</div><div class="stat-val" id="stat_stations">—</div><div class="stat-label">Stations</div></div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🚉 All Stations</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Station</th><th>Location</th><th>Platform</th></tr></thead>
+            <tbody id="stations_tbody"><tr><td colspan="4" style="color:var(--muted);padding:20px">Loading from Oracle...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+      <!-- BOOK TICKET -->
+      <div id="p_book" class="panel">
+        <div class="section-title">Book <span>Ticket</span></div>
+        <div class="section-sub">Select route → vehicle → ticket type → confirm. Data saves directly to Oracle.</div>
+        <div class="wizard-steps">
+          <div class="wstep active" id="ws1"><span class="wstep-num">1</span>Route</div>
+          <div class="wstep" id="ws2"><span class="wstep-num">2</span>Vehicle</div>
+          <div class="wstep" id="ws3"><span class="wstep-num">3</span>Ticket Type</div>
+          <div class="wstep" id="ws4"><span class="wstep-num">4</span>Confirm</div>
+        </div>
+        <div id="wizard_1" class="wizard-page active">
+          <div class="form-card">
+            <div class="form-card-title">🗺️ Select Route</div>
+            <div id="route_options"><p style="color:var(--muted)">Loading routes from Oracle...</p></div>
+            <button class="btn-full" style="margin-top:12px" onclick="wizardNext(1)">Next: Choose Vehicle →</button>
+          </div>
+        </div>
+        <div id="wizard_2" class="wizard-page">
+          <div class="form-card">
+            <div class="form-card-title">🚌 Select Vehicle / Schedule</div>
+            <div id="vehicle_options"></div>
+            <div style="display:flex;gap:12px;margin-top:12px">
+              <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="wizardBack(2)">← Back</button>
+              <button class="btn-full" onclick="wizardNext(2)">Next: Ticket Type →</button>
+            </div>
+          </div>
+        </div>
+        <div id="wizard_3" class="wizard-page">
+          <div class="form-card">
+            <div class="form-card-title">🎟️ Select Ticket Type</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px" id="ticket_type_options">
+              <div class="route-option" id="tt_Economy" onclick="selectTicketType('Economy')" style="flex-direction:column;text-align:center"><div style="font-size:2rem">🎟️</div><div class="route-name">Economy</div><div class="route-meta">PKR 500</div><span class="check-icon">✓</span></div>
+              <div class="route-option" id="tt_Standard" onclick="selectTicketType('Standard')" style="flex-direction:column;text-align:center"><div style="font-size:2rem">🎫</div><div class="route-name">Standard</div><div class="route-meta">PKR 350</div><span class="check-icon">✓</span></div>
+              <div class="route-option" id="tt_Business" onclick="selectTicketType('Business')" style="flex-direction:column;text-align:center"><div style="font-size:2rem">💼</div><div class="route-name">Business</div><div class="route-meta">PKR 1,200</div><span class="check-icon">✓</span></div>
+              <div class="route-option" id="tt_VIP" onclick="selectTicketType('VIP')" style="flex-direction:column;text-align:center"><div style="font-size:2rem">👑</div><div class="route-name">VIP</div><div class="route-meta">PKR 3,500</div><span class="check-icon">✓</span></div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:16px">
+              <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="wizardBack(3)">← Back</button>
+              <button class="btn-full" onclick="wizardNext(3)">Review Booking →</button>
+            </div>
+          </div>
+        </div>
+        <div id="wizard_4" class="wizard-page">
+          <div class="form-card">
+            <div class="form-card-title">✅ Confirm Booking</div>
+            <div class="ticket-confirm" id="booking_summary"></div>
+            <div style="display:flex;gap:12px;margin-top:16px">
+              <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="wizardBack(4)">← Back</button>
+              <button class="btn-full amber" id="confirm_btn" onclick="confirmBooking()">🎫 CONFIRM & BOOK (INSERT to Oracle)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- MY TICKETS -->
+      <div id="p_tickets" class="panel">
+        <div class="section-title">My <span>Tickets</span></div>
+        <div class="section-sub">Fetched live from Oracle Ticket table using JOIN query.</div>
+        <div id="my_tickets_list"><p style="color:var(--muted);padding:20px">Loading...</p></div>
+      </div>
+      <!-- ROUTES -->
+      <div id="p_routes" class="panel">
+        <div class="section-title">All <span>Routes</span></div>
+        <div class="section-sub">From Oracle via JOIN (Route + Station).</div>
+        <div class="form-card"><div class="table-wrap"><table>
+          <thead><tr><th>ID</th><th>Route Name</th><th>Distance</th><th>From</th><th>To</th></tr></thead>
+          <tbody id="routes_tbody"></tbody>
+        </table></div></div>
+      </div>
+      <!-- SCHEDULE -->
+      <div id="p_schedule" class="panel">
+        <div class="section-title">Schedule <span>Board</span></div>
+        <div class="section-sub">From Oracle via JOIN (Schedule + Route + Driver + Vehicle).</div>
+        <div class="form-card"><div class="table-wrap"><table>
+          <thead><tr><th>#</th><th>Route</th><th>Departure</th><th>Arrival</th><th>Frequency</th><th>Vehicle</th></tr></thead>
+          <tbody id="schedule_tbody"></tbody>
+        </table></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="adminDash" class="screen">
+  <nav class="topnav">
+    <div class="nav-brand">⚙️ ADMIN<span>PANEL</span> <span class="db-badge">ORACLE LIVE</span></div>
+    <div class="nav-user"><strong>transport_admin</strong> · Superuser
+      <button class="nav-logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="dash-body">
+    <aside class="sidebar">
+      <ul class="sidebar-menu">
+        <li><a href="#" class="active" onclick="showAdmPanel('a_home',this)"><span>📊</span> Overview</a></li>
+        <li><a href="#" onclick="showAdmPanel('a_passengers',this);loadAdmPassengers()"><span>👥</span> Passengers</a></li>
+        <li><a href="#" onclick="showAdmPanel('a_tickets',this);loadAdmTickets()"><span>🎫</span> All Tickets</a></li>
+        <li><a href="#" onclick="showAdmPanel('a_routes',this);loadAdmRoutes()"><span>🗺️</span> Routes</a></li>
+        <li><a href="#" onclick="showAdmPanel('a_vehicles',this);loadAdmVehicles()"><span>🚌</span> Vehicles</a></li>
+        <li><a href="#" onclick="showAdmPanel('a_drivers',this);loadAdmDrivers()"><span>👨‍✈️</span> Drivers</a></li>
+        <li><a href="#" onclick="showAdmPanel('a_schedule',this);loadAdmSchedules();populateScheduleDropdowns(document.getElementById('as_route'),document.getElementById('as_vehicle'),document.getElementById('as_driver'))"><span>📅</span> Schedules</a></li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <!-- OVERVIEW -->
+      <div id="a_home" class="panel active">
+        <div class="section-title">Admin <span>Overview</span></div>
+        <div class="section-sub">Live counts from Oracle 11g.</div>
+        <div class="cards-grid">
+          <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-val" id="adm_pax">—</div><div class="stat-label">Passengers</div></div>
+          <div class="stat-card amber"><div class="stat-icon">🎫</div><div class="stat-val" id="adm_tix">—</div><div class="stat-label">Tickets</div></div>
+          <div class="stat-card green"><div class="stat-icon">🗺️</div><div class="stat-val" id="adm_routes">—</div><div class="stat-label">Routes</div></div>
+          <div class="stat-card red"><div class="stat-icon">🚌</div><div class="stat-val" id="adm_veh">—</div><div class="stat-label">Vehicles</div></div>
+          <div class="stat-card"><div class="stat-icon">👨‍✈️</div><div class="stat-val" id="adm_drv">—</div><div class="stat-label">Drivers</div></div>
+          <div class="stat-card amber"><div class="stat-icon">💰</div><div class="stat-val" id="adm_rev">—</div><div class="stat-label">Revenue (PKR)</div></div>
+        </div>
+      </div>
+      <!-- PASSENGERS -->
+      <div id="a_passengers" class="panel">
+        <div class="section-title">Manage <span>Passengers</span></div>
+        <div class="section-sub">INSERT calls Add_Passenger procedure. UPDATE fires trg_auto_calc_age trigger.</div>
+        <div class="form-card">
+          <div class="form-card-title">➕ Add New Passenger (Stored Procedure)</div>
+          <div class="field-row">
+            <div class="field"><label>Full Name</label><input type="text" id="ap_name" placeholder="Ali Ahmed"></div>
+            <div class="field"><label>Email</label><input type="email" id="ap_email" placeholder="ali@email.com"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Phone Number</label><input type="text" id="ap_phone" placeholder="03001234567"></div>
+            <div class="field"><label>Date of Birth</label><input type="date" id="ap_dob"></div>
+          </div>
+          <button class="btn-full amber" style="max-width:250px" id="ap_btn" onclick="adminAddPassenger()">INSERT INTO Passenger (Oracle)</button>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">👥 All Passengers</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>DOB</th><th>Age</th><th>Actions</th></tr></thead>
+            <tbody id="adm_pax_tbody"><tr><td colspan="7" style="color:var(--muted);padding:20px">Loading...</td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+      <!-- TICKETS -->
+      <div id="a_tickets" class="panel">
+        <div class="section-title">All <span>Tickets</span></div>
+        <div class="section-sub">From Oracle via multi-table JOIN (Ticket + Passenger + Schedule + Route).</div>
+        <div class="form-card"><div class="table-wrap"><table>
+          <thead><tr><th>Ticket #</th><th>Passenger</th><th>Route</th><th>Type</th><th>Price</th><th>Date</th></tr></thead>
+          <tbody id="adm_tix_tbody"></tbody>
+        </table></div></div>
+      </div>
+      <!-- ROUTES ADMIN -->
+      <div id="a_routes" class="panel">
+        <div class="section-title">Manage <span>Routes</span></div>
+        <div class="form-card">
+          <div class="form-card-title">➕ Add Route</div>
+          <div class="field-row">
+            <div class="field"><label>Route Name</label><input type="text" id="ar_name" placeholder="City A - City B Express"></div>
+            <div class="field"><label>Distance (km)</label><input type="number" id="ar_dist" placeholder="120"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Start Station</label><select id="ar_start"><option value="">-- Select --</option></select></div>
+            <div class="field"><label>End Station</label><select id="ar_end"><option value="">-- Select --</option></select></div>
+          </div>
+          <button class="btn-full amber" style="max-width:250px" onclick="adminAddRoute()">INSERT INTO Route (Oracle)</button>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">🗺️ All Routes (ActiveRoutes_VW)</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Route</th><th>Distance</th><th>From</th><th>To</th><th>Actions</th></tr></thead>
+            <tbody id="adm_routes_tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+      <!-- VEHICLES -->
+      <div id="a_vehicles" class="panel">
+        <div class="section-title">Manage <span>Vehicles</span></div>
+        
+        <!-- Add New Vehicle Form -->
+        <div class="form-card">
+          <div class="form-card-title">➕ Add New Vehicle</div>
+          <div class="field-row">
+            <div class="field"><label>Model</label><input type="text" id="av_model" placeholder="Coaster / Green Line"></div>
+            <div class="field"><label>Capacity</label><input type="number" id="av_capacity" placeholder="30"></div>
+          </div>
+          <button class="btn-full amber" style="max-width:250px" onclick="adminAddVehicle()">INSERT INTO Vehicle (Oracle)</button>
+        </div>
+
+        <div class="form-card">
+          <div class="form-card-title">🚌 Fleet Vehicles</div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Model</th><th>Capacity</th><th>Type</th><th>Bus/Train #</th><th>Actions</th></tr></thead>
+            <tbody id="adm_veh_tbody"></tbody>
+          </table></div>
+        </div>
+      </div>
+      <!-- DRIVERS -->
+      <div id="a_drivers" class="panel">
+  <div class="section-title">Manage <span>Drivers</span></div>
+  
+  <!-- Add New Driver Form -->
+  <div class="form-card">
+    <div class="form-card-title">➕ Add New Driver</div>
+    <div class="field-row">
+      <div class="field"><label>Driver Name</label><input type="text" id="ad_name" placeholder="John Doe"></div>
+      <div class="field"><label>License Number</label><input type="text" id="ad_license" placeholder="ABC-12345"></div>
+    </div>
+    <div class="field"><label>Experience (Years)</label><input type="number" id="ad_exp" placeholder="5"></div>
+    <button class="btn-full amber" style="max-width:250px" onclick="adminAddDriver()">INSERT INTO Driver</button>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-title">👨‍✈️ All Drivers</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>Name</th><th>License</th><th>Experience</th><th>Actions</th></tr></thead>
+      <tbody id="adm_drv_tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+      <!-- SCHEDULES -->
+      <div id="a_schedule" class="panel">
+        <div class="section-title">Manage <span>Schedules</span></div>
+
+        <!-- Add New Schedule Form -->
+        <div class="form-card">
+          <div class="form-card-title">➕ Add New Schedule</div>
+          <div class="field-row">
+            <div class="field"><label>Route</label><select id="as_route"><option value="">-- Select Route --</option></select></div>
+            <div class="field"><label>Vehicle</label><select id="as_vehicle"><option value="">-- Select Vehicle --</option></select></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Driver</label><select id="as_driver"><option value="">-- Select Driver --</option></select></div>
+            <div class="field"><label>Frequency</label>
+              <select id="as_freq">
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Twice Daily">Twice Daily</option>
+                <option value="Hourly">Hourly</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Departure Time (YYYY-MM-DD HH:MM)</label><input type="text" id="as_dep" placeholder="2025-06-01 08:00"></div>
+            <div class="field"><label>Arrival Time (YYYY-MM-DD HH:MM)</label><input type="text" id="as_arr" placeholder="2025-06-01 10:00"></div>
+          </div>
+          <button class="btn-full amber" style="max-width:280px" onclick="adminAddSchedule()">INSERT INTO Schedule (Oracle)</button>
+        </div>
+
+        <div class="form-card"><div class="table-wrap"><table>
+          <thead><tr><th>ID</th><th>Route</th><th>Departure</th><th>Arrival</th><th>Frequency</th><th>Driver</th><th>Vehicle</th><th>Actions</th></tr></thead>
+          <tbody id="adm_sched_tbody"></tbody>
+        </table></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Edit Passenger Modal -->
+<div class="edit-modal" id="editPaxModal">
+  <div class="edit-modal-box">
+    <div class="edit-modal-title">✏️ UPDATE Passenger (Oracle)</div>
+    <input type="hidden" id="edit_pax_id">
+    <div class="field-row">
+      <div class="field"><label>Name</label><input type="text" id="edit_pax_name"></div>
+      <div class="field"><label>Email</label><input type="email" id="edit_pax_email"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Phone</label><input type="text" id="edit_pax_phone"></div>
+      <div class="field"><label>DOB</label><input type="date" id="edit_pax_dob"></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('editPaxModal').classList.remove('open')">Cancel</button>
+      <button class="btn-full amber" id="save_pax_btn" onclick="saveEditPassenger()">SAVE (UPDATE + Trigger)</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Driver Modal -->
+<div class="edit-modal" id="editDriverModal">
+  <div class="edit-modal-box">
+    <div class="edit-modal-title">✏️ Update Driver</div>
+    <input type="hidden" id="edit_drv_id">
+    <div class="field"><label>Driver Name</label><input type="text" id="edit_drv_name"></div>
+    <div class="field"><label>License Number</label><input type="text" id="edit_drv_license"></div>
+    <div class="field"><label>Experience</label><input type="number" id="edit_drv_exp"></div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="closeDriverModal()">Cancel</button>
+      <button class="btn-full amber" onclick="saveEditDriver()">Update Driver</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Vehicle Modal -->
+<div class="edit-modal" id="editVehicleModal">
+  <div class="edit-modal-box">
+    <div class="edit-modal-title">✏️ Update Vehicle</div>
+    <input type="hidden" id="edit_veh_id">
+    <div class="field"><label>Model</label><input type="text" id="edit_veh_model"></div>
+    <div class="field"><label>Capacity</label><input type="number" id="edit_veh_capacity"></div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('editVehicleModal').classList.remove('open')">Cancel</button>
+      <button class="btn-full amber" onclick="saveEditVehicle()">Update Vehicle</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Schedule Modal -->
+<div class="edit-modal" id="editScheduleModal">
+  <div class="edit-modal-box">
+    <div class="edit-modal-title">✏️ Update Schedule</div>
+    <input type="hidden" id="edit_sch_id">
+    <div class="field-row">
+      <div class="field"><label>Route</label><select id="edit_sch_route"><option value="">-- Select Route --</option></select></div>
+      <div class="field"><label>Vehicle</label><select id="edit_sch_vehicle"><option value="">-- Select Vehicle --</option></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Driver</label><select id="edit_sch_driver"><option value="">-- Select Driver --</option></select></div>
+      <div class="field"><label>Frequency</label>
+        <select id="edit_sch_freq">
+          <option value="Daily">Daily</option>
+          <option value="Weekly">Weekly</option>
+          <option value="Twice Daily">Twice Daily</option>
+          <option value="Hourly">Hourly</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Departure (YYYY-MM-DD HH:MM)</label><input type="text" id="edit_sch_dep"></div>
+      <div class="field"><label>Arrival (YYYY-MM-DD HH:MM)</label><input type="text" id="edit_sch_arr"></div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <button class="btn-full" style="background:var(--surface);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('editScheduleModal').classList.remove('open')">Cancel</button>
+      <button class="btn-full amber" onclick="saveEditSchedule()">Update Schedule</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:5000/api';
+let currentUser = null, currentRole = null;
+let bookingState = {routeID:null,routeName:'',scheduleID:null,vehicleModel:'',type:null,departure:''};
+
+// ── UTILS ──
+function toast(msg, err=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(err?' error':'');
+  setTimeout(()=>t.className='toast',4000);
+}
+async function api(path, method='GET', body=null){
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  const res=await fetch(API+path,opts);
+  return res.json();
+}
+function setLoading(btnId, loading, text){
+  const btn=document.getElementById(btnId);
+  if(!btn)return;
+  btn.disabled=loading;
+  btn.innerHTML=loading?`<span class="loader"></span>${text}...`:text;
+}
+function badgeClass(type){
+  return {Economy:'badge-blue',Standard:'badge-green',Business:'badge-amber',VIP:'badge-red'}[type]||'badge-blue';
+}
+
+// ── AUTH ──
+function openModal(tab){ document.getElementById('authModal').classList.add('open'); switchAuthTab(tab); }
+function closeModal(){ document.getElementById('authModal').classList.remove('open'); }
+function switchAuthTab(tab){
+  const sf=document.getElementById('signinForm'),uf=document.getElementById('signupForm');
+  const tabs=document.querySelectorAll('.tab-btn');
+  if(tab==='signin'){
+    sf.style.display='block';uf.style.display='none';
+    tabs[0].classList.add('active');tabs[1].classList.remove('active');
+    document.getElementById('modalTitle').textContent='Welcome Back';
+    document.getElementById('modalSub').textContent='Sign in to access your transport account';
+  } else {
+    sf.style.display='none';uf.style.display='block';
+    tabs[1].classList.add('active');tabs[0].classList.remove('active');
+    document.getElementById('modalTitle').textContent='Create Account';
+    document.getElementById('modalSub').textContent='Your data saves directly to Oracle 11g';
+  }
+}
+
+async function doSignIn(){
+  const email=document.getElementById('si_email').value.trim();
+  const pass=document.getElementById('si_pass').value.trim();
+  const role=document.getElementById('si_role').value;
+  document.getElementById('si_error').style.display='none';
+  setLoading('si_btn',true,'SIGNING IN');
+  try{
+    const res=await api('/login','POST',{email,password:pass,role});
+    if(res.success){
+      currentUser=res; currentRole=res.role;
+      document.getElementById('si_success').style.display='block';
+      setTimeout(()=>{
+        closeModal();
+        if(res.role==='admin'){ showScreen('adminDash'); initAdmin(); }
+        else { showScreen('passengerDash'); initPassenger(); }
+      },700);
+    } else {
+      document.getElementById('si_error').textContent=res.message;
+      document.getElementById('si_error').style.display='block';
+    }
+  } catch(e){
+    document.getElementById('si_error').textContent='Cannot reach Flask server. Is app.py running?';
+    document.getElementById('si_error').style.display='block';
+  }
+  setLoading('si_btn',false,'SIGN IN →');
+}
+
+async function doSignUp(){
+  const name=document.getElementById('su_name').value.trim();
+  const email=document.getElementById('su_email').value.trim();
+  const phone=document.getElementById('su_phone').value.trim();
+  const phone2=document.getElementById('su_phone2').value.trim();
+  const dob=document.getElementById('su_dob').value;
+  const err=document.getElementById('su_error');
+  err.style.display='none';
+  if(!name||!email||!phone||!dob){err.textContent='Fill all fields.';err.style.display='block';return;}
+  if(phone!==phone2){err.textContent='Phone numbers do not match.';err.style.display='block';return;}
+  setLoading('su_btn',true,'CREATING');
+  try{
+    const res=await api('/signup','POST',{name,email,phone,dob});
+    if(res.success){
+      document.getElementById('su_success').style.display='block';
+      toast('✓ Account created! Your phone number is your password.');
+      setTimeout(()=>{document.getElementById('su_success').style.display='none';switchAuthTab('signin');document.getElementById('si_email').value=email;},2000);
+    } else { err.textContent=res.message;err.style.display='block'; }
+  } catch(e){err.textContent='Cannot reach Flask server.';err.style.display='block';}
+  setLoading('su_btn',false,'CREATE ACCOUNT →');
+}
+
+function logout(){ currentUser=null; currentRole=null; showScreen('landing'); toast('Logged out.'); }
+
+// ── SCREENS ──
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function showPaxPanel(id,el){
+  document.querySelectorAll('#passengerDash .panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#passengerDash .sidebar-menu a').forEach(a=>a.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+function showAdmPanel(id,el){
+  document.querySelectorAll('#adminDash .panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('#adminDash .sidebar-menu a').forEach(a=>a.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+// ── PASSENGER INIT ──
+async function initPassenger(){
+  document.getElementById('pax_name').textContent=currentUser.name;
+  // Load stats
+  const stats=await api('/stats');
+  if(stats.success){
+    document.getElementById('stat_routes').textContent=stats.data.routes;
+    document.getElementById('stat_vehicles').textContent=stats.data.vehicles;
+    document.getElementById('stat_stations').textContent=stats.data.stations;
+  }
+  // Load my ticket count
+  const myT=await api('/tickets/my/'+currentUser.id);
+  if(myT.success) document.getElementById('pax_my_tickets').textContent=myT.data.length;
+  // Stations
+  const st=await api('/stations');
+  if(st.success){
+    document.getElementById('stations_tbody').innerHTML=st.data.map(s=>`<tr>
+      <td>${s.stationid}</td><td><strong>${s.stationname}</strong></td>
+      <td>${s.location}</td><td><span class="badge badge-blue">${s.platform}</span></td>
+    </tr>`).join('');
+  }
+  // Routes
+  const rt=await api('/routes');
+  if(rt.success){
+    document.getElementById('routes_tbody').innerHTML=rt.data.map(r=>`<tr>
+      <td>${r.routeid}</td><td><strong>${r.routename}</strong></td>
+      <td><span class="badge badge-amber">${r.distance} km</span></td>
+      <td>${r.startstation}</td><td>${r.endstation}</td>
+    </tr>`).join('');
+    // Populate booking wizard routes
+    document.getElementById('route_options').innerHTML=rt.data.map(r=>`
+      <div class="route-option" id="ro_${r.routeid}" onclick="selectRoute(${r.routeid},'${r.routename.replace(/'/g,'&apos;')}','${r.startstation}','${r.endstation}',${r.distance})">
+        <div>
+          <div class="route-name">🚩 ${r.routename}</div>
+          <div class="route-meta">${r.startstation} → ${r.endstation} · ${r.distance} km</div>
+        </div>
+        <span class="check-icon">✓</span>
+      </div>`).join('');
+  }
+  // Schedules
+  const sc=await api('/schedules');
+  if(sc.success){
+    document.getElementById('schedule_tbody').innerHTML=sc.data.map(s=>`<tr>
+      <td>${s.scheduleid}</td><td>${s.routename}</td>
+      <td>${s.departuretime}</td><td>${s.arrivaltime}</td>
+      <td><span class="badge badge-green">${s.frequency}</span></td>
+      <td>${s.vehiclemodel}</td>
+    </tr>`).join('');
+  }
+}
+
+async function loadMyTickets(){
+  document.getElementById('my_tickets_list').innerHTML='<p style="color:var(--muted)">Loading from Oracle...</p>';
+  const res=await api('/tickets/my/'+currentUser.id);
+  const el=document.getElementById('my_tickets_list');
+  if(!res.success){el.innerHTML='<p style="color:var(--red)">Error: '+res.message+'</p>';return;}
+  if(res.data.length===0){el.innerHTML='<p style="color:var(--muted);padding:20px">No tickets yet. Book your first trip!</p>';return;}
+  el.innerHTML=res.data.map(t=>`<div class="my-ticket">
+    <div class="ticket-info">
+      <h4>🎫 Ticket #${t.ticketnumber} — ${t.routename}</h4>
+      <p>${t.fromstation} → ${t.tostation} · ${t.vehiclemodel} · Departs: ${t.departuretime}</p>
+      <p style="margin-top:4px"><span class="badge ${badgeClass(t.type)}">${t.type}</span> · Issued: ${t.issuedate}</p>
+    </div>
+    <div>
+      <div class="ticket-price">PKR ${Number(t.price).toLocaleString()}</div>
+      <button class="action-btn del-btn" style="margin-top:8px;width:100%" onclick="cancelTicket(${t.ticketnumber})">Cancel</button>
+    </div>
+  </div>`).join('');
+  document.getElementById('pax_my_tickets').textContent=res.data.length;
+}
+
+async function cancelTicket(tnum){
+  if(!confirm('Cancel ticket #'+tnum+'?'))return;
+  const res=await api('/tickets/'+tnum,'DELETE');
+  toast(res.success?'✓ '+res.message:'✗ '+res.message, !res.success);
+  if(res.success) loadMyTickets();
+}
+
+// ── BOOKING WIZARD ──
+async function selectRoute(id,name,from,to,dist){
+  bookingState.routeID=id; bookingState.routeName=name;
+  document.querySelectorAll('[id^="ro_"]').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('ro_'+id).classList.add('selected');
+  // Fetch schedules for this route from Oracle
+  const res=await api('/schedules/by-route/'+id);
+  const vo=document.getElementById('vehicle_options');
+  if(!res.success||res.data.length===0){vo.innerHTML='<p style="color:var(--muted)">No schedules found for this route.</p>';return;}
+  vo.innerHTML=res.data.map(s=>`<div class="route-option" id="vs_${s.scheduleid}" onclick="selectSchedule(${s.scheduleid},'${s.vehiclemodel}','${s.departuretime}')">
+    <div>
+      <div class="route-name">${s.vehicletype==='Train'?'🚆':'🚌'} ${s.vehiclemodel} (${s.vehiclenumber||''})</div>
+      <div class="route-meta">Departs: ${s.departuretime} · ${s.frequency} · Capacity: ${s.capacity}</div>
+    </div>
+    <span class="check-icon">✓</span>
+  </div>`).join('');
+}
+
+function selectSchedule(schedID,model,dep){
+  bookingState.scheduleID=schedID; bookingState.vehicleModel=model; bookingState.departure=dep;
+  document.querySelectorAll('[id^="vs_"]').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('vs_'+schedID).classList.add('selected');
+}
+
+function selectTicketType(type){
+  bookingState.type=type;
+  document.querySelectorAll('[id^="tt_"]').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('tt_'+type).classList.add('selected');
+}
+
+const prices={Economy:500,Standard:350,Business:1200,VIP:3500};
+function wizardNext(step){
+  if(step===1&&!bookingState.routeID){toast('Select a route first.',true);return;}
+  if(step===2&&!bookingState.scheduleID){toast('Select a vehicle/schedule.',true);return;}
+  if(step===3&&!bookingState.type){toast('Select a ticket type.',true);return;}
+  if(step===3){
+    document.getElementById('booking_summary').innerHTML=`
+      <div class="ticket-num">NEW TICKET</div>
+      <p style="color:var(--muted);font-size:.8rem;margin-bottom:16px">Will be inserted into Oracle Ticket table</p>
+      <div class="ticket-detail"><span>Passenger</span><span>${currentUser.name}</span></div>
+      <div class="ticket-detail"><span>Route</span><span>${bookingState.routeName}</span></div>
+      <div class="ticket-detail"><span>Departure</span><span>${bookingState.departure}</span></div>
+      <div class="ticket-detail"><span>Vehicle</span><span>${bookingState.vehicleModel}</span></div>
+      <div class="ticket-detail"><span>Type</span><span>${bookingState.type}</span></div>
+      <div class="ticket-detail"><span>Price</span><span style="color:var(--accent2);font-size:1.2rem">PKR ${prices[bookingState.type].toLocaleString()}</span></div>
+    `;
+  }
+  document.getElementById('wizard_'+step).classList.remove('active');
+  document.getElementById('wizard_'+(step+1)).classList.add('active');
+  document.getElementById('ws'+step).classList.replace('active','done');
+  document.getElementById('ws'+(step+1)).classList.add('active');
+}
+function wizardBack(step){
+  document.getElementById('wizard_'+step).classList.remove('active');
+  document.getElementById('wizard_'+(step-1)).classList.add('active');
+  document.getElementById('ws'+(step-1)).classList.replace('done','active');
+  document.getElementById('ws'+step).classList.remove('active');
+}
+
+async function confirmBooking(){
+  setLoading('confirm_btn',true,'INSERTING INTO ORACLE');
+  const res=await api('/tickets/book','POST',{
+    passengerID:currentUser.id, scheduleID:bookingState.scheduleID, type:bookingState.type
+  });
+  setLoading('confirm_btn',false,'🎫 CONFIRM & BOOK (INSERT to Oracle)');
+  if(res.success){
+    toast('🎫 Ticket #'+res.ticketNumber+' saved to Oracle! PKR '+res.price);
+    // Reset wizard
+    bookingState={routeID:null,routeName:'',scheduleID:null,vehicleModel:'',type:null,departure:''};
+    ['1','2','3','4'].forEach(i=>{document.getElementById('wizard_'+i).classList.remove('active');document.getElementById('ws'+i).classList.remove('active','done');});
+    document.getElementById('wizard_1').classList.add('active');
+    document.getElementById('ws1').classList.add('active');
+    document.getElementById('pax_my_tickets').textContent=parseInt(document.getElementById('pax_my_tickets').textContent||0)+1;
+  } else { toast('✗ Error: '+res.message, true); }
+}
+
+// ── ADMIN INIT ──
+async function initAdmin(){
+  const stats=await api('/stats');
+  if(stats.success){
+    const d=stats.data;
+    document.getElementById('adm_pax').textContent=d.passengers;
+    document.getElementById('adm_tix').textContent=d.tickets;
+    document.getElementById('adm_routes').textContent=d.routes;
+    document.getElementById('adm_veh').textContent=d.vehicles;
+    document.getElementById('adm_drv').textContent=d.drivers;
+    document.getElementById('adm_rev').textContent=Number(d.revenue).toLocaleString();
+  }
+  // Populate station dropdowns for route form
+  const st=await api('/stations');
+  if(st.success){
+    const opts=st.data.map(s=>`<option value="${s.stationid}">${s.stationname}</option>`).join('');
+    document.getElementById('ar_start').innerHTML='<option value="">-- Select --</option>'+opts;
+    document.getElementById('ar_end').innerHTML='<option value="">-- Select --</option>'+opts;
+  }
+}
+
+async function loadAdmPassengers(){
+  const res=await api('/passengers');
+  if(!res.success){toast(res.message,true);return;}
+  document.getElementById('adm_pax_tbody').innerHTML=res.data.map(p=>`<tr>
+    <td>${p.passengerid}</td><td><strong>${p.passengername}</strong></td>
+    <td>${p.passengeremail}</td><td>${p.phonenumber}</td>
+    <td>${p.dob?String(p.dob).substring(0,10):''}</td>
+    <td><span class="badge badge-blue">${p.age}</span></td>
+    <td>
+      <button class="action-btn edit-btn" onclick='openEditPax(${JSON.stringify(p)})'>✏️ Edit</button>
+      <button class="action-btn del-btn" onclick="deletePax(${p.passengerid})">🗑️ Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function loadAdmTickets(){
+  const res=await api('/tickets');
+  if(!res.success){toast(res.message,true);return;}
+  document.getElementById('adm_tix_tbody').innerHTML=res.data.map(t=>`<tr>
+    <td><strong>#${t.ticketnumber}</strong></td>
+    <td>${t.passengername}</td><td>${t.routename}</td>
+    <td><span class="badge ${badgeClass(t.type)}">${t.type}</span></td>
+    <td>PKR ${Number(t.price).toLocaleString()}</td><td>${t.issuedate}</td>
+  </tr>`).join('');
+}
+
+async function loadAdmRoutes(){
+  const res=await api('/routes');
+  if(!res.success){toast(res.message,true);return;}
+  document.getElementById('adm_routes_tbody').innerHTML=res.data.map(r=>`<tr>
+    <td>${r.routeid}</td><td><strong>${r.routename}</strong></td>
+    <td>${r.distance} km</td><td>${r.startstation}</td><td>${r.endstation}</td>
+    <td><button class="action-btn del-btn" onclick="deleteRoute(${r.routeid})">🗑️ Del</button></td>
+  </tr>`).join('');
+}
+
+async function loadAdmVehicles(){
+  const res=await api('/vehicles');
+  if(!res.success){toast(res.message,true);return;}
+  document.getElementById('adm_veh_tbody').innerHTML=res.data.map(v=>`<tr>
+    <td>${v.vehicleid}</td><td><strong>${v.model}</strong></td><td>${v.capacity}</td>
+    <td><span class="badge ${v.vehicletype==='Train'?'badge-green':'badge-blue'}">${v.vehicletype}</span></td>
+    <td>${v.busnumber||v.trainnumber||'—'}</td>
+    <td>
+      <button class="action-btn edit-btn" onclick='openEditVehicle(${JSON.stringify(v)})'>✏️ Edit</button>
+      <button class="action-btn del-btn" onclick="deleteVehicle(${v.vehicleid})">🗑️ Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function loadAdmDrivers(){
+  const res = await api('/drivers');
+  if(!res.success){ toast(res.message, true); return; }
+  
+  document.getElementById('adm_drv_tbody').innerHTML = res.data.map(d => `<tr>
+    <td>${d.driverid}</td>
+    <td><strong>${d.drivername}</strong></td>
+    <td>${d.licensenumber}</td>
+    <td><span class="badge ${d.experience >= 10 ? 'badge-amber' : 'badge-blue'}">${d.experience} yrs</span></td>
+    <td>
+      <button class="action-btn edit-btn" onclick='openEditDriver(${JSON.stringify(d)})'>✏️ Edit</button>
+      <button class="action-btn del-btn" onclick="deleteDriver(${d.driverid})">🗑️ Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function loadAdmSchedules(){
+  const res = await api('/schedules');
+  if(!res.success){ toast(res.message, true); return; }
+  
+  document.getElementById('adm_sched_tbody').innerHTML = res.data.map(s => `<tr>
+    <td>${s.scheduleid}</td>
+    <td>${s.routename}</td>
+    <td>${s.departuretime}</td>
+    <td>${s.arrivaltime}</td>
+    <td><span class="badge badge-green">${s.frequency}</span></td>
+    <td>${s.drivername}</td>
+    <td>${s.vehiclemodel}</td>
+    <td>
+      <button class="action-btn edit-btn" onclick='openEditSchedule(${JSON.stringify(s)})'>✏️ Edit</button>
+      <button class="action-btn del-btn" onclick="deleteSchedule(${s.scheduleid})">🗑️ Del</button>
+    </td>
+  </tr>`).join('');
+}
+
+// ── ADMIN CRUD ──
+async function adminAddPassenger(){
+  const name=document.getElementById('ap_name').value.trim();
+  const email=document.getElementById('ap_email').value.trim();
+  const phone=document.getElementById('ap_phone').value.trim();
+  const dob=document.getElementById('ap_dob').value;
+  if(!name||!email||!phone||!dob){toast('Fill all fields.',true);return;}
+  setLoading('ap_btn',true,'INSERTING');
+  const res=await api('/passengers','POST',{name,email,phone,dob});
+  setLoading('ap_btn',false,'INSERT INTO Passenger (Oracle)');
+  toast(res.success?'✓ '+res.message:'✗ '+res.message,!res.success);
+  if(res.success){['ap_name','ap_email','ap_phone','ap_dob'].forEach(id=>document.getElementById(id).value='');loadAdmPassengers();}
+}
+
+function openEditPax(p){
+  document.getElementById('edit_pax_id').value=p.passengerid;
+  document.getElementById('edit_pax_name').value=p.passengername;
+  document.getElementById('edit_pax_email').value=p.passengeremail;
+  document.getElementById('edit_pax_phone').value=p.phonenumber;
+  document.getElementById('edit_pax_dob').value=p.dob?String(p.dob).substring(0,10):'';
+  document.getElementById('editPaxModal').classList.add('open');
+}
+async function saveEditPassenger(){
+  const id=document.getElementById('edit_pax_id').value;
+  const data={
+    name:document.getElementById('edit_pax_name').value,
+    email:document.getElementById('edit_pax_email').value,
+    phone:document.getElementById('edit_pax_phone').value,
+    dob:document.getElementById('edit_pax_dob').value
+  };
+  setLoading('save_pax_btn',true,'UPDATING');
+  const res=await api('/passengers/'+id,'PUT',data);
+  setLoading('save_pax_btn',false,'SAVE (UPDATE + Trigger)');
+  document.getElementById('editPaxModal').classList.remove('open');
+  toast(res.success?'✓ '+res.message:'✗ '+res.message,!res.success);
+  if(res.success) loadAdmPassengers();
+}
+async function deletePax(id){
+  if(!confirm('DELETE passenger #'+id+' and all their tickets?'))return;
+  const res=await api('/passengers/'+id,'DELETE');
+  toast(res.success?'✓ '+res.message:'✗ '+res.message,!res.success);
+  if(res.success) loadAdmPassengers();
+}
+async function adminAddRoute(){
+  const name=document.getElementById('ar_name').value.trim();
+  const distance=document.getElementById('ar_dist').value;
+  const startStationID=document.getElementById('ar_start').value;
+  const endStationID=document.getElementById('ar_end').value;
+  if(!name||!distance||!startStationID||!endStationID){toast('Fill all route fields.',true);return;}
+  const res=await api('/routes','POST',{name,distance:parseInt(distance),startStationID:parseInt(startStationID),endStationID:parseInt(endStationID)});
+  toast(res.success?'✓ '+res.message:'✗ '+res.message,!res.success);
+  if(res.success){['ar_name','ar_dist'].forEach(id=>document.getElementById(id).value='');loadAdmRoutes();}
+}
+async function deleteRoute(id){
+  if(!confirm('Delete route #'+id+'?'))return;
+  const res=await api('/routes/'+id,'DELETE');
+  toast(res.success?'✓ '+res.message:'✗ '+res.message,!res.success);
+  if(res.success) loadAdmRoutes();
+}
+
+// ── NEW ADMIN OPERATIONS (VEHICLE, DRIVER, SCHEDULE) ──
+
+async function adminAddVehicle() {
+  const model = document.getElementById('av_model').value.trim();
+  const cap = document.getElementById('av_capacity').value;
+  if(!model || !cap){ toast('Fill all fields.', true); return; }
+  const res = await api('/vehicles', 'POST', { model, capacity: parseInt(cap) });
+  toast(res.success ? '✓ Vehicle Added' : '✗ Error', !res.success);
+  if(res.success){ document.getElementById('av_model').value=''; document.getElementById('av_capacity').value=''; loadAdmVehicles(); }
+}
+
+function openEditVehicle(v) {
+  document.getElementById('edit_veh_id').value = v.vehicleid;
+  document.getElementById('edit_veh_model').value = v.model;
+  document.getElementById('edit_veh_capacity').value = v.capacity;
+  document.getElementById('editVehicleModal').classList.add('open');
+}
+
+async function saveEditVehicle() {
+  const id = document.getElementById('edit_veh_id').value;
+  const data = {
+    model: document.getElementById('edit_veh_model').value,
+    capacity: document.getElementById('edit_veh_capacity').value
+  };
+  const res = await api('/vehicles/' + id, 'PUT', data);
+  if(res.success) {
+    toast('✓ Vehicle updated');
+    document.getElementById('editVehicleModal').classList.remove('open');
+    loadAdmVehicles();
+  } else { toast('✗ Error: ' + res.message, true); }
+}
+
+async function deleteVehicle(id) {
+  if(!confirm('Delete this vehicle?')) return;
+  const res = await api('/vehicles/' + id, 'DELETE');
+  toast(res.success ? '✓ Vehicle Removed' : '✗ Error', !res.success);
+  if(res.success) loadAdmVehicles();
+}
+
+async function adminAddDriver() {
+  const name = document.getElementById('ad_name').value;
+  const license = document.getElementById('ad_license').value;
+  const exp = document.getElementById('ad_exp').value;
+  const res = await api('/drivers', 'POST', { name, license, experience: exp });
+  toast(res.success ? '✓ Driver Added' : '✗ Error: ' + res.message, !res.success);
+  if(res.success){ document.getElementById('ad_name').value=''; document.getElementById('ad_license').value=''; document.getElementById('ad_exp').value=''; loadAdmDrivers(); }
+}
+
+function openEditDriver(d) {
+  document.getElementById('edit_drv_id').value = d.driverid;
+  document.getElementById('edit_drv_name').value = d.drivername;
+  document.getElementById('edit_drv_license').value = d.licensenumber;
+  document.getElementById('edit_drv_exp').value = d.experience;
+  document.getElementById('editDriverModal').classList.add('open');
+}
+
+function closeDriverModal() { document.getElementById('editDriverModal').classList.remove('open'); }
+
+async function saveEditDriver() {
+  const id = document.getElementById('edit_drv_id').value;
+  const data = {
+    name: document.getElementById('edit_drv_name').value,
+    license: document.getElementById('edit_drv_license').value,
+    experience: document.getElementById('edit_drv_exp').value
+  };
+  const res = await api('/drivers/' + id, 'PUT', data);
+  if(res.success) { toast('✓ Driver updated'); closeDriverModal(); loadAdmDrivers(); } 
+  else { toast('✗ Error: ' + res.message, true); }
+}
+
+async function deleteDriver(id) {
+  if(!confirm('Delete this driver?')) return;
+  const res = await api('/drivers/' + id, 'DELETE');
+  toast(res.success ? '✓ Driver Removed' : '✗ Error', !res.success);
+  if(res.success) loadAdmDrivers();
+}
+
+async function deleteSchedule(id) {
+  if(!confirm('Cancel this schedule?')) return;
+  const res = await api('/schedules/' + id, 'DELETE');
+  toast(res.success ? '✓ Schedule deleted' : '✗ Error', !res.success);
+  if(res.success) loadAdmSchedules();
+}
+
+// NOTE: openEditSchedule would follow the same modal pattern as above.
+
+// ── SCHEDULE INSERT / EDIT ──
+
+async function populateScheduleDropdowns(routeSel, vehicleSel, driverSel) {
+  const [routes, vehicles, drivers] = await Promise.all([
+    api('/routes'), api('/vehicles'), api('/drivers')
+  ]);
+  if (routes.success) {
+    const opts = routes.data.map(r => `<option value="${r.routeid}">${r.routename}</option>`).join('');
+    routeSel.innerHTML = '<option value="">-- Select Route --</option>' + opts;
+  }
+  if (vehicles.success) {
+    const opts = vehicles.data.map(v => `<option value="${v.vehicleid}">${v.model} (${v.vehicletype})</option>`).join('');
+    vehicleSel.innerHTML = '<option value="">-- Select Vehicle --</option>' + opts;
+  }
+  if (drivers.success) {
+    const opts = drivers.data.map(d => `<option value="${d.driverid}">${d.drivername}</option>`).join('');
+    driverSel.innerHTML = '<option value="">-- Select Driver --</option>' + opts;
+  }
+}
+
+async function adminAddSchedule() {
+  const routeID   = document.getElementById('as_route').value;
+  const vehicleID = document.getElementById('as_vehicle').value;
+  const driverID  = document.getElementById('as_driver').value;
+  const departure = document.getElementById('as_dep').value.trim();
+  const arrival   = document.getElementById('as_arr').value.trim();
+  const frequency = document.getElementById('as_freq').value;
+  if (!routeID || !vehicleID || !driverID || !departure || !arrival) {
+    toast('Fill all schedule fields.', true); return;
+  }
+  const res = await api('/schedules', 'POST', { routeID: parseInt(routeID), vehicleID: parseInt(vehicleID), driverID: parseInt(driverID), departure, arrival, frequency });
+  toast(res.success ? '✓ Schedule Added' : '✗ ' + res.message, !res.success);
+  if (res.success) {
+    ['as_dep','as_arr'].forEach(id => document.getElementById(id).value = '');
+    loadAdmSchedules();
+  }
+}
+
+async function openEditSchedule(s) {
+  document.getElementById('edit_sch_id').value = s.scheduleid;
+  document.getElementById('edit_sch_dep').value = s.departuretime || '';
+  document.getElementById('edit_sch_arr').value = s.arrivaltime || '';
+  document.getElementById('edit_sch_freq').value = s.frequency || 'Daily';
+  await populateScheduleDropdowns(
+    document.getElementById('edit_sch_route'),
+    document.getElementById('edit_sch_vehicle'),
+    document.getElementById('edit_sch_driver')
+  );
+  document.getElementById('edit_sch_route').value   = s.routeid   || '';
+  document.getElementById('edit_sch_vehicle').value = s.vehicleid || '';
+  document.getElementById('edit_sch_driver').value  = s.driverid  || '';
+  document.getElementById('editScheduleModal').classList.add('open');
+}
+
+async function saveEditSchedule() {
+  const id = document.getElementById('edit_sch_id').value;
+  const data = {
+    routeID:   document.getElementById('edit_sch_route').value,
+    vehicleID: document.getElementById('edit_sch_vehicle').value,
+    driverID:  document.getElementById('edit_sch_driver').value,
+    departure: document.getElementById('edit_sch_dep').value,
+    arrival:   document.getElementById('edit_sch_arr').value,
+    frequency: document.getElementById('edit_sch_freq').value
+  };
+  if (!data.routeID || !data.vehicleID || !data.driverID || !data.departure || !data.arrival) {
+    toast('Fill all fields.', true); return;
+  }
+  const res = await api('/schedules/' + id, 'PUT', data);
+  if (res.success) {
+    toast('✓ Schedule updated');
+    document.getElementById('editScheduleModal').classList.remove('open');
+    loadAdmSchedules();
+  } else { toast('✗ ' + res.message, true); }
+}
+</script>
+</body>
+</html>
