@@ -21,7 +21,7 @@ To ensure strict data integrity and efficient querying, this system heavily util
 * `SmartCityTransport_connected.html`: The main frontend user interface.
 * `app.py`: The Python/Flask API that connects the HTML frontend to the Oracle Database.
 * `Database_Scripts.sql`: Contains all DDL and DML scripts, including table creation, views, triggers, and procedures.
-* `24F-0567_24F-0512_EERD.pdf`: The Enhanced Entity-Relationship Diagram mapping out our database architecture.
+
 
 ## 🚀 How to Run Locally
 *Note: Because this system relies on a local Oracle database, the frontend cannot be hosted purely on GitHub Pages. You must run the backend locally.*
