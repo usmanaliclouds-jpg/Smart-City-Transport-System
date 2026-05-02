@@ -38,8 +38,9 @@ To ensure strict data integrity and efficient querying, this system heavily util
    * The UI will now successfully communicate with your local Oracle Database.
 
 ## 👨‍💻 Authors
-* **Taheer Bin Hussain** - [GitHub Profile](https://github.com/TaheerBinHussain) | [LinkedIn Profile](#)
-* **Usman Ali** - [GitHub Profile](https://github.com/usmanaliclouds-jpg) | [LinkedIn Profile](#)
+* **Usman Ali** - [GitHub Profile](https://github.com/usmanaliclouds-jpg) | [LinkedIn Profile](https://www.linkedin.com/in/usmanalicloud/)
+* **Taheer Bin Hussain** - [GitHub Profile](https://github.com/TaheerBinHussain) | [LinkedIn Profile](www.linkedin.com/in/taheer-bin-hussain)
+
 
 ---
 *Developed for the Database Lab Semester Project — May 2026*
