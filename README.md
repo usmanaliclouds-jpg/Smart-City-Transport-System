@@ -1,8 +1,8 @@
 # 🚆 Smart City Transport System
 
-[cite_start]This repository contains the Database Systems semester project developed by **Taheer Bin Hussain** (24F-0567) and **Usman Ali** (24F-0512)[cite: 72, 152]. 
+This repository contains the Database Systems semester project developed by **Taheer Bin Hussain** (24F-0567) and **Usman Ali** (24F-0512). 
 
-[cite_start]It is a full-stack transport management system designed for the Faisalabad region[cite: 73]. [cite_start]The core of this project is a robust **Oracle 11g** database, designed from the ground up to handle passenger ticketing, route management, vehicle scheduling, and administrative reporting[cite: 74].
+It is a full-stack transport management system designed for the Faisalabad region[cite: 73]. [cite_start]The core of this project is a robust **Oracle 11g** database, designed from the ground up to handle passenger ticketing, route management, vehicle scheduling, and administrative reporting[cite: 74].
 
 ## 🛠️ Tech Stack
 * [cite_start]**Database:** Oracle 11g [cite: 60]
