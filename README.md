@@ -2,20 +2,20 @@
 
 This repository contains the Database Systems semester project developed by **Taheer Bin Hussain** (24F-0567) and **Usman Ali** (24F-0512). 
 
-It is a full-stack transport management system designed for the Faisalabad region[cite: 73]. [cite_start]The core of this project is a robust **Oracle 11g** database, designed from the ground up to handle passenger ticketing, route management, vehicle scheduling, and administrative reporting[cite: 74].
+It is a full-stack transport management system designed for the Faisalabad region. The core of this project is a robust **Oracle 11g** database, designed from the ground up to handle passenger ticketing, route management, vehicle scheduling, and administrative reporting.
 
 ## 🛠️ Tech Stack
-* [cite_start]**Database:** Oracle 11g [cite: 60]
+* **Database:** Oracle 11g
 * **Backend API:** Python / Flask
 * **Frontend:** Custom HTML, CSS, and JavaScript
 
 ## 📊 Database Concepts Implemented
-[cite_start]To ensure strict data integrity and efficient querying, this system heavily utilizes advanced SQL and PL/SQL components as per our project requirements[cite: 140, 147]:
-* [cite_start]**Complex Joins:** Used extensively to fetch interconnected data (e.g., linking passengers, tickets, routes, and schedules)[cite: 147].
-* [cite_start]**Subqueries:** Implemented for advanced data filtering and validation[cite: 147].
-* [cite_start]**Views:** Created (e.g., `ActiveRoutes_VW`) to simplify complex frontend reporting queries.
-* [cite_start]**Automated Triggers:** Designed to handle background calculations automatically (e.g., calculating passenger age based on DOB).
-* [cite_start]**Stored Procedures:** Used to securely handle data insertions (e.g., adding new passengers or schedules).
+To ensure strict data integrity and efficient querying, this system heavily utilizes advanced SQL and PL/SQL components as per our project requirements:
+* **Complex Joins:** Used extensively to fetch interconnected data (e.g., linking passengers, tickets, routes, and schedules).
+* **Subqueries:** Implemented for advanced data filtering and validation.
+* **Views:** Created (e.g., `ActiveRoutes_VW`) to simplify complex frontend reporting queries.
+* **Automated Triggers:** Designed to handle background calculations automatically (e.g., calculating passenger age based on DOB).
+* **Stored Procedures:** Used to securely handle data insertions (e.g., adding new passengers or schedules).
 
 ## 🗂️ Repository Contents
 * `SmartCityTransport_connected.html`: The main frontend user interface.
